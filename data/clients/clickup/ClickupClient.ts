@@ -1,6 +1,6 @@
+import { getTime } from "date-fns";
 import { FetchHttpClient } from "../http/FetchHttpClient";
 import { HttpClient } from "../http/HttpClient";
-import { getTime } from "date-fns";
 
 export class ClickupClient {
     private client: HttpClient;
@@ -67,12 +67,7 @@ export class ClickupClient {
             })
             .getData();
 
-        return data.map(({ start, end, at, ...rest }) => ({
-            ...rest,
-            start: new Date(start),
-            end: new Date(end),
-            at: new Date(at),
-        }));
+        return data;
     }
 }
 

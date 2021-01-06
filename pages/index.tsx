@@ -1,52 +1,103 @@
+import jsHttpCookie from "cookie";
+import { addMinutes, format, roundToNearestMinutes } from "date-fns";
+import _ from "lodash";
+import { InferGetServerSidePropsType } from "next";
 import React from "react";
 import styled from "styled-components";
 import { Navigation } from "../components/navigation/Navigation";
 import { TimerBar } from "../components/timer-bar/TimerBar";
-import { ClickupClient } from "../data/clients/clickup/ClickupClient";
-import jsHttpCookie from "cookie";
+import { ListTimeEntries } from "../domain/usecases/ListTimeEntries";
 
-export const TimerPage: React.FC<{ data: string }> = React.memo(props => {
-    console.log(JSON.parse(props.data));
-    
+export const TimerPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+    const entries = _(props.data)
+        .orderBy(["startTime"], ["desc"])
+        .groupBy(({ startTime }) => format(parseInt(startTime), "E, d LLL"))
+        .toPairs()
+        .value();
+
     return (
         <React.Fragment>
             <Navigation />
             <PageWrapper>
                 <EnhancedPage>
                     <TimerBar />
-                    <EntryList>
-                        <EntryListHeader>
-                            <EntryListTitle>
-                                <EntryListTitleContents>
-                                    <span>Mon, 4 Jan</span>
-                                </EntryListTitleContents>
-                                <div></div>
-                                <EntryListTime>
-                                    <span>1:30:00</span>
-                                </EntryListTime>
-                            </EntryListTitle>
-                        </EntryListHeader>
-                        <EntryListItem>
-                            <EntryListText>Fix search, sorting and pagination</EntryListText>
-                            <EntryListProject>
-                                <Task color="#465bb3">Predictors-Extended App</Task>
-                                <Space>WHO</Space>
-                            </EntryListProject>
-                            <DurationContent>
-                                <OverviewTime>
-                                    <span>0:45:00</span>
-                                </OverviewTime>
-                                <TotalTime>
-                                    <span>6:30 PM - 7:15 PM</span>
-                                </TotalTime>
-                            </DurationContent>
-                        </EntryListItem>
-                    </EntryList>
+                    {entries.map(([date, entries]) => (
+                        <EntryList key={date}>
+                            <EntryListHeader>
+                                <EntryListTitle>
+                                    <EntryListTitleContents>
+                                        <span>{date}</span>
+                                    </EntryListTitleContents>
+                                    <div></div>
+                                    <EntryListTime>
+                                        <span>
+                                            {parseDuration(
+                                                _.sum(
+                                                    entries.map(({ duration }) =>
+                                                        parseInt(duration)
+                                                    )
+                                                )
+                                            )}
+                                        </span>
+                                    </EntryListTime>
+                                </EntryListTitle>
+                            </EntryListHeader>
+                            {entries.map(
+                                ({ id, description, task, startTime, endTime, duration }) => (
+                                    <EntryListItem key={id}>
+                                        <EntryListText>
+                                            {description || "No description"}
+                                        </EntryListText>
+                                        <EntryListProject>
+                                            <Task color={stringToColor(task.name)}>
+                                                {task.name}
+                                            </Task>
+                                            {false && <Space>WHO</Space>}
+                                        </EntryListProject>
+                                        <DurationContent>
+                                            <OverviewTime>
+                                                <span>{parseDuration(parseInt(duration))}</span>
+                                            </OverviewTime>
+                                            <TotalTime>
+                                                <span>{`${formatTime(
+                                                    parseInt(startTime)
+                                                )} - ${formatTime(parseInt(endTime))}`}</span>
+                                            </TotalTime>
+                                        </DurationContent>
+                                    </EntryListItem>
+                                )
+                            )}
+                        </EntryList>
+                    ))}
                 </EnhancedPage>
             </PageWrapper>
         </React.Fragment>
     );
-});
+};
+
+function parseDuration(diff: number) {
+    const date = roundToNearestMinutes(diff);
+    return format(addMinutes(date, date.getTimezoneOffset()), "HH:mm:ss");
+}
+
+function formatTime(date: number) {
+    return format(date, "HH:mm a");
+}
+
+function stringToColor(string: string): string {
+    var hash = 0;
+    if (string.length === 0) return "blue";
+    for (var i = 0; i < string.length; i++) {
+        hash = string.charCodeAt(i) + ((hash << 5) - hash);
+        hash = hash & hash;
+    }
+    var color = "#";
+    for (var i = 0; i < 3; i++) {
+        var value = (hash >> (i * 8)) & 255;
+        color += ("00" + value.toString(16)).substr(-2);
+    }
+    return color;
+}
 
 const PageWrapper = styled.div`
     overflow: hidden;
@@ -166,15 +217,15 @@ const EntryListProject = styled.div`
     margin-right: auto;
 `;
 
-const Task = styled.div`
+const Task = styled.div<{ color: string }>`
     display: flex;
     -webkit-box-align: center;
     align-items: center;
-    color: rgb(55, 72, 141);
+    color: ${props => props.color};
     white-space: pre;
 
     :before {
-        color: rgb(70, 91, 179);
+        color: ${props => props.color};
         margin: 0px 5px 0px 0px;
         font-size: 26px;
         display: inline-block;
@@ -232,11 +283,11 @@ const OverviewTime = styled.div`
 
 export async function getServerSideProps({ req }) {
     const { token } = jsHttpCookie.parse(req.headers.cookie);
-    const client = new ClickupClient(token);
-    const data = await client.listTimeEntries(4528615);
+    const client = new ListTimeEntries();
+    const data = await client.execute(token, 4528615);
 
     // Pass data to the page via props
-    return { props: { data: JSON.stringify(data) } };
+    return { props: { data } };
 }
 
 export default TimerPage;
