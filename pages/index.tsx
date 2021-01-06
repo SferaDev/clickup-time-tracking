@@ -282,11 +282,10 @@ const OverviewTime = styled.div`
 `;
 
 export async function getServerSideProps({ req }) {
-    const { token } = jsHttpCookie.parse(req.headers.cookie);
+    const { token } = jsHttpCookie.parse(req.headers.cookie ?? "");
     const client = new ListTimeEntries();
-    const data = await client.execute(token, 4528615);
-
-    // Pass data to the page via props
+    const data = token ? await client.execute(token, 4528615) : [];
+    
     return { props: { data } };
 }
 
