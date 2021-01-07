@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { Navigation } from "../components/navigation/Navigation";
 import { TimerBar } from "../components/timer-bar/TimerBar";
 import { TimerEntries } from "../components/timer-entries/TimerEntries";
-import { ListTimeEntries } from "../domain/usecases/ListTimeEntries";
+import { getCompositionRoot } from "../domain/CompositionRoot";
 
 export const TimerPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
     return (
@@ -41,8 +41,9 @@ const EnhancedPage = styled.div`
 
 export async function getServerSideProps({ req }) {
     const { token } = jsHttpCookie.parse(req.headers.cookie ?? "");
-    const client = new ListTimeEntries();
-    const entries = token ? await client.execute(token, 4528615) : [];
+
+    const compositionRoot = getCompositionRoot();
+    const entries = token ? await compositionRoot.timeTracking.list(token, 4528615) : [];
 
     return { props: { entries } };
 }
