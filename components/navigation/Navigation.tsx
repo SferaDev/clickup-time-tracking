@@ -1,11 +1,15 @@
+import jsCookie from "js-cookie";
+import { useRouter } from "next/router";
 import React from "react";
 import styled from "styled-components";
-import jsCookie from "js-cookie";
 
 export const Navigation: React.FC = React.memo(() => {
+    const router = useRouter();
+
     const setToken = () => {
         const token = window.prompt("Save clickup token");
         jsCookie.set("token", token);
+        router.replace(router.asPath);
     };
 
     return (
@@ -30,9 +34,9 @@ export const Navigation: React.FC = React.memo(() => {
                             <MenuEntrySelected>
                                 <MenuEntryLink onClick={setToken}>
                                     <MenuEntryIcon>
-                                        <svg width="16" height="16" viewBox="0 0 18 18">
+                                        <svg width="16" height="16" viewBox="0 0 24 24">
                                             <path
-                                                d="M8.001 8.948L8 9c0 .556.448 1 1 1h3c.556 0 1-.448 1-1 0-.556-.448-1-1-1h-2V4.003a1 1 0 10-2 0v4.894l.001.051zM9 18A9 9 0 109 0a9 9 0 000 18z"
+                                                d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"
                                                 fill="#fce5d8"
                                                 fillRule="evenodd"
                                             ></path>
@@ -84,7 +88,9 @@ const NavigationHeader = styled.div`
     -webkit-box-pack: center;
     justify-content: center;
     height: 66px;
-    padding: 10px;
+    margin: 10px;
+    margin-bottom: 20px;
+    margin-top: 20px;
 `;
 
 const MenuWrapper = styled.div`
@@ -117,6 +123,7 @@ const Header = styled.div`
     margin-bottom: 7px;
     border-top: 1px solid transparent;
     margin-top: 0px;
+    width: 100%;
 `;
 
 const HeaderText = styled.span`
@@ -126,7 +133,8 @@ const HeaderText = styled.span`
     text-transform: uppercase;
     letter-spacing: 0.4px;
     display: none;
-    padding: 0px calc(18px);
+    padding-left: 20px;
+    padding-bottom: 20px;
     opacity: 0;
     color: rgb(130, 113, 136);
     line-height: 1;
