@@ -11,6 +11,10 @@ export const TimerEntries: React.FC<{ entries: TimeEntry[] }> = props => {
         .toPairs()
         .value();
 
+    const openTask = (id: string) => {
+        window.open(`https://app.clickup.com/t/${id}`, "_blank");
+    };
+
     return (
         <React.Fragment>
             {entries.map(([date, entries]) => (
@@ -34,7 +38,12 @@ export const TimerEntries: React.FC<{ entries: TimeEntry[] }> = props => {
                         <EntryListItem key={id}>
                             <EntryListText>{description || "No description"}</EntryListText>
                             <EntryListProject>
-                                <Task color={stringToColor(task.name)}>{task.name}</Task>
+                                <Task
+                                    color={stringToColor(task.name)}
+                                    onClick={() => openTask(task.id)}
+                                >
+                                    {task.name}
+                                </Task>
                                 {false && <Space>WHO</Space>}
                             </EntryListProject>
                             <DurationContent>
