@@ -6,7 +6,12 @@ export const TimerBar: React.FC = React.memo(() => {
         <NewTimeEntry>
             <TimerForm>
                 <TimerContainer>
-                    <TimerDescription data-placeholder="What are you working on?"></TimerDescription>
+                    <TimerDescription
+                        autoComplete="off"
+                        spellCheck="false"
+                        type="text"
+                        placeholder="What are you working on?"
+                    />
                 </TimerContainer>
                 <TimerContainer2>
                     <TimerTrigger>
@@ -92,11 +97,10 @@ const TimerContainer = styled.div`
     font-size: 16px;
 `;
 
-const TimerDescription = styled.div`
+const TimerDescription = styled.input`
     display: flex;
     width: 100%;
     height: 65px;
-    -webkit-box-align: center;
     align-items: center;
     padding: 0px 5px 0px 20px;
     border: 0px;
@@ -105,11 +109,15 @@ const TimerDescription = styled.div`
     text-overflow: ellipsis;
     white-space: pre;
 
-    :before {
-        content: attr(data-placeholder);
+    font-size: 18px;
+    font-weight: 500;
+
+    :focus {
+        outline: none;
+    }
+
+    :placeholder {
         color: rgb(149, 137, 155);
-        font-size: 18px;
-        font-weight: 500;
     }
 `;
 
