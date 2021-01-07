@@ -23,13 +23,19 @@ export class ClickupClient {
         };
     }
 
+    public get tasks() {
+        return {
+            get: this.buildEndpoint("get", "task/{{task}}"),
+        };
+    }
+
     public async request<T extends keyof ApiEndpoints>(
         method: ApiEndpoints[T]["method"],
         url: T,
         params?: ApiEndpoints[T]["params"]
     ): Promise<ApiEndpoints[T]["response"]> {
-        const { data } = await this.client
-            .request<ApiResponse<ApiEndpoints[T]["response"]>>({
+        const data = await this.client
+            .request<ApiEndpoints[T]["response"]>({
                 method,
                 url: stringReplacer(url, params),
                 params,
@@ -40,7 +46,7 @@ export class ClickupClient {
     }
 
     private buildEndpoint<T extends keyof ApiEndpoints>(method: ApiEndpoints[T]["method"], url: T) {
-        return (requestParams?: Omit<ApiEndpoints[T]["params"], "api_token">) =>
+        return (requestParams?: ApiEndpoints[T]["params"]) =>
             this.request(method, url, requestParams);
     }
 }
@@ -49,44 +55,122 @@ interface ApiOptions {
     apiVersion?: number;
 }
 
-interface ApiResponse<T> {
-    data: T;
-}
-
 interface ApiEndpoints {
     "team/{{team}}/time_entries": {
         method: "get";
         params: { team: number; start_date?: number; end_date?: number; assignee?: number[] };
-        response: Array<{
-            id: string;
-            task: {
+        response: {
+            data: Array<{
                 id: string;
-                custom_id: string;
-                name: string;
-                status: {
-                    status: string;
-                    color: string;
-                    type: string;
-                    orderindex: number;
+                task: {
+                    id: string;
+                    custom_id: string;
+                    name: string;
+                    status: {
+                        status: string;
+                        color: string;
+                        type: string;
+                        orderindex: number;
+                    };
                 };
-            };
-            wid: string;
-            user: {
-                id: 1;
-                username: string;
-                email: string;
-                color: string;
-                initials: string;
-                profilePicture: string;
-            };
-            billable: boolean;
-            start: string; // ms time
-            end: string; // ms time
-            duration: string;
+                wid: string;
+                user: {
+                    id: 1;
+                    username: string;
+                    email: string;
+                    color: string;
+                    initials: string;
+                    profilePicture: string;
+                };
+                billable: boolean;
+                start: string; // ms time
+                end: string; // ms time
+                duration: string;
+                description: string;
+                tags: string[];
+                source: string;
+                at: string; // ms time
+            }>;
+        };
+    };
+    "task/{{task}}": {
+        method: "get";
+        params: { task: string };
+        response: {
+            id: string;
+            custom_id: string | null;
+            name: string;
+            text_content: string;
             description: string;
+            status: {
+                status: string;
+                color: string;
+                orderindex: number;
+                type: string;
+            };
+            orderindex: string;
+            date_created: string; // ms time
+            date_updated: string; // ms time
+            date_closed: string | null;
+            archived: boolean;
+            creator: {
+                id: number;
+                username: string;
+                color: string;
+                email: string;
+                profilePicture: string | null;
+            };
+            assignees: Array<{
+                id: number;
+                username: string;
+                color: string;
+                email: string;
+                profilePicture: string | null;
+                initials: string;
+            }>;
+            watchers: Array<{
+                id: number;
+                username: string;
+                color: string;
+                email: string;
+                profilePicture: string | null;
+                initials: string;
+            }>;
+            checklists: string[];
             tags: string[];
-            source: string;
-            at: string; // ms time
-        }>;
+            parent: string | null;
+            priority: string | null;
+            due_date: string | null;
+            start_date: string | null;
+            points: string | null;
+            time_estimate: number | null; // unknown
+            time_spent: number | null;
+            dependencies: string[];
+            linked_tasks: string[];
+            team_id: string;
+            url: string;
+            permission_level: string;
+            list: {
+                id: string;
+                name: string;
+                access: boolean;
+            };
+            project: {
+                id: string;
+                name: string;
+                hidden: boolean;
+                access: boolean;
+            };
+            folder: {
+                id: string;
+                name: string;
+                hidden: boolean;
+                access: boolean;
+            };
+            space: {
+                id: string;
+            };
+            attachments: string[];
+        };
     };
 }

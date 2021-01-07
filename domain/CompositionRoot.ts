@@ -1,9 +1,9 @@
-import { ListTimeEntries } from "./usecases/ListTimeEntries";
+import { ListTimeEntriesUseCase } from "./usecases/ListTimeEntriesUseCase";
 
 export function getCompositionRoot() {
     return {
         timeTracking: getExecute({
-            list: new ListTimeEntries(),
+            list: new ListTimeEntriesUseCase(),
         }),
     };
 }

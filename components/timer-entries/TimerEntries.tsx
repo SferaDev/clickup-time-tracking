@@ -34,30 +34,51 @@ export const TimerEntries: React.FC<{ entries: TimeEntry[] }> = props => {
                             </EntryListTime>
                         </EntryListTitle>
                     </EntryListHeader>
-                    {entries.map(({ id, description, task, startTime, endTime, duration }) => (
-                        <EntryListItem key={id}>
-                            <EntryListText>{description || "No description"}</EntryListText>
-                            <EntryListProject>
-                                <Task
-                                    color={stringToColor(task.name)}
-                                    onClick={() => openTask(task.id)}
-                                >
-                                    {task.name}
-                                </Task>
-                                {false && <Space>WHO</Space>}
-                            </EntryListProject>
-                            <DurationContent>
-                                <OverviewTime>
-                                    <span>{parseDuration(parseInt(duration))}</span>
-                                </OverviewTime>
-                                <TotalTime>
-                                    <span>{`${formatTime(parseInt(startTime))} - ${formatTime(
-                                        parseInt(endTime)
-                                    )}`}</span>
-                                </TotalTime>
-                            </DurationContent>
-                        </EntryListItem>
-                    ))}
+                    {entries.map(
+                        ({
+                            id,
+                            description,
+                            task,
+                            project,
+                            startTime,
+                            endTime,
+                            duration,
+                            billable,
+                        }) => (
+                            <EntryListItem key={id}>
+                                <EntryListText>{description || "No description"}</EntryListText>
+                                <EntryListProject onClick={() => openTask(task.id)}>
+                                    <Project color={stringToColor(project.name)}>
+                                        {project.name}
+                                    </Project>
+                                    <Task>{task.name}</Task>
+                                </EntryListProject>
+                                <Billable>
+                                    <svg width="17" height="17" viewBox="0 0 17 17">
+                                        <path
+                                            d="M2.5 12C3 13.5 4 14.5 6 14.5s3.5-1.2 3.5-2.7c0-4-7-1.6-7-5.6C2.5 4.7 4 3.5 6 3.5c1.5 0 3 1 3.5 2.5M6 2v14"
+                                            fill="none"
+                                            fillRule="evenodd"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            stroke={billable ? "#991102" : "rgb(213, 208, 215)"}
+                                        ></path>
+                                    </svg>
+                                </Billable>
+                                <DurationContent>
+                                    <OverviewTime>
+                                        <span>{parseDuration(parseInt(duration))}</span>
+                                    </OverviewTime>
+                                    <TotalTime>
+                                        <span>{`${formatTime(parseInt(startTime))} - ${formatTime(
+                                            parseInt(endTime)
+                                        )}`}</span>
+                                    </TotalTime>
+                                </DurationContent>
+                            </EntryListItem>
+                        )
+                    )}
                 </EntryList>
             ))}
         </React.Fragment>
@@ -74,18 +95,12 @@ function formatTime(date: number) {
 }
 
 function stringToColor(string: string): string {
-    var hash = 0;
-    if (string.length === 0) return "blue";
+    let hash = 0;
     for (var i = 0; i < string.length; i++) {
         hash = string.charCodeAt(i) + ((hash << 5) - hash);
-        hash = hash & hash;
     }
-    var color = "#";
-    for (var i = 0; i < 3; i++) {
-        var value = (hash >> (i * 8)) & 255;
-        color += ("00" + value.toString(16)).substr(-2);
-    }
-    return color;
+
+    return `hsl(${hash % 360}, 75%, 60%)`;
 }
 
 const EntryList = styled.ul`
@@ -188,7 +203,7 @@ const EntryListProject = styled.div`
     margin-right: auto;
 `;
 
-const Task = styled.div<{ color: string }>`
+const Project = styled.div<{ color: string }>`
     display: flex;
     -webkit-box-align: center;
     align-items: center;
@@ -207,7 +222,7 @@ const Task = styled.div<{ color: string }>`
     }
 `;
 
-const Space = styled.div`
+const Task = styled.div`
     color: rgb(129, 113, 135);
     margin-left: 0px;
 
@@ -250,4 +265,18 @@ const OverviewTime = styled.div`
     font-weight: 400;
     white-space: pre-wrap;
     margin: 0px 37.5px;
+`;
+
+const Billable = styled.div`
+    display: flex;
+    flex-shrink: 0;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    border-radius: 8px;
+    background-color: transparent;
 `;
