@@ -1,7 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 
 export const TimerBar: React.FC = React.memo(() => {
+    const [newTask, updateNewTask] = useState<{ description: string }>({ description: "" });
+
+    const saveTask = () => {
+        window.alert("Not yet implemented");
+    };
+
     return (
         <NewTimeEntry>
             <TimerForm>
@@ -11,6 +17,10 @@ export const TimerBar: React.FC = React.memo(() => {
                         spellCheck="false"
                         type="text"
                         placeholder="What are you working on?"
+                        value={newTask.description}
+                        onChange={event =>
+                            updateNewTask(task => ({ ...task, description: event.target.value }))
+                        }
                     />
                 </TimerContainer>
                 <TimerContainer2>
@@ -21,19 +31,6 @@ export const TimerBar: React.FC = React.memo(() => {
                                     fill="#95899b"
                                     fillRule="evenodd"
                                     d="M0 6h16v4.994A2.001 2.001 0 0114.006 13H1.994A1.993 1.993 0 010 10.994V6zm0-4a2 2 0 012.004-2h3.05c1.107 0 2.004.895 2.004 2h6.935C15.102 2 16 2.895 16 4H0V2z"
-                                ></path>
-                            </svg>
-                        </TimerIcon>
-                    </TimerTrigger>
-                </TimerContainer2>
-                <TimerContainer2>
-                    <TimerTrigger>
-                        <TimerIcon title="Select project">
-                            <svg width="17" height="17" viewBox="0 0 17 17">
-                                <path
-                                    d="M0 6.002c0 1.103.633 2.63 1.416 3.414l6.168 6.168a1.996 1.996 0 002.828.004l5.176-5.176c.78-.78.78-2.045-.004-2.828L9.416 1.416C8.634.634 7.113 0 6.002 0H1.998A1.993 1.993 0 000 1.998v4.004zM4 6a2 2 0 100-4 2 2 0 000 4z"
-                                    fill="#95899b"
-                                    fillRule="evenodd"
                                 ></path>
                             </svg>
                         </TimerIcon>
@@ -61,6 +58,21 @@ export const TimerBar: React.FC = React.memo(() => {
                         <span>0:00:00</span>
                     </Duration>
                 </div>
+                <Button title="Start time entry" onClick={saveTask}>
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="36"
+                        height="36"
+                        viewBox="0 0 40 40"
+                        version="1"
+                    >
+                        <g fill-rule="evenodd" fill="none">
+                            <g fill="#C463BA">
+                                <path d="M20 0C9 0 0 9 0 20 0 31 9 40 20 40 31 40 40 31 40 20 40 9 31 0 20 0ZM17 23.4L13.1 19.4C12.5 18.9 11.5 18.9 10.9 19.4 10.4 20 10.4 21 10.9 21.6L15.9 26.6C16.5 27.1 17.5 27.1 18.1 26.6L29.1 15.6C29.6 15 29.6 14 29.1 13.4 28.5 12.9 27.5 12.9 26.9 13.4L17 23.4Z"></path>
+                            </g>
+                        </g>
+                    </svg>
+                </Button>
             </TimerForm>
         </NewTimeEntry>
     );
@@ -169,4 +181,19 @@ const Duration = styled.div`
     :after :before {
         box-sizing: border-box;
     }
+`;
+
+const Button = styled.div`
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    cursor: pointer;
+    user-select: none;
+    margin-right: 20px;
 `;
