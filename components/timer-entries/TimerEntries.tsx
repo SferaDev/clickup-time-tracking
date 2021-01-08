@@ -100,7 +100,7 @@ function stringToColor(string: string): string {
         hash = string.charCodeAt(i) + ((hash << 5) - hash);
     }
 
-    return `hsl(${hash % 360}, 75%, 60%)`;
+    return `hsl(${hash % 100}, 60%, 50%)`;
 }
 
 const EntryList = styled.ul`
