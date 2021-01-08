@@ -8,7 +8,7 @@ export const Navigation: React.FC = React.memo(() => {
 
     const setToken = () => {
         const token = window.prompt("Save clickup token");
-        jsCookie.set("token", token);
+        jsCookie.set("token", token, { expires: 30 });
         router.replace(router.asPath);
     };
 
