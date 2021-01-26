@@ -1,3 +1,4 @@
+import { cache } from "../../utils/cache";
 import { stringReplacer } from "../../utils/string";
 import { FetchHttpClient } from "../http/FetchHttpClient";
 import { HttpClient } from "../http/HttpClient";
@@ -26,6 +27,7 @@ export class ClickupClient {
     public get tasks() {
         return {
             get: this.buildEndpoint("get", "task/{{task}}"),
+            list: this.buildEndpoint("get", "list/{{list}}/task"),
         };
     }
 
@@ -41,6 +43,13 @@ export class ClickupClient {
         };
     }
 
+    public get lists() {
+        return {
+            list: this.buildEndpoint("get", "folder/{{folder}}/list"),
+        };
+    }
+
+    @cache()
     public async request<T extends keyof ApiEndpoints>(
         method: ApiEndpoints[T]["method"],
         url: T,
@@ -324,6 +333,104 @@ interface ApiEndpoints {
                     permission_level: string;
                 }>;
                 permission_level: string;
+            }>;
+        };
+    };
+    "folder/{{folder}}/list": {
+        method: "get";
+        params: { folder: number; archived: boolean };
+        response: {
+            lists: Array<{
+                id: string;
+                name: string;
+                orderindex: number;
+                status: null;
+                priority: null;
+                assignee: null;
+                task_count: string;
+                due_date: null;
+                start_date: null;
+                folder: {
+                    id: string;
+                    name: string;
+                    hidden: boolean;
+                    access: boolean;
+                };
+                space: {
+                    id: string;
+                    name: string;
+                    access: boolean;
+                };
+                archived: boolean;
+                override_statuses: boolean;
+                permission_level: string;
+            }>;
+        };
+    };
+    "list/{{list}}/task": {
+        method: "get";
+        params: { list: number; archived: boolean };
+        response: {
+            tasks: Array<{
+                id: string;
+                custom_id: null;
+                name: string;
+                text_content: null;
+                description: null;
+                status: {
+                    status: string;
+                    color: string;
+                    type: string;
+                    orderindex: number;
+                };
+                orderindex: string;
+                date_created: string;
+                date_updated: string;
+                date_closed: null;
+                archived: boolean;
+                creator: {
+                    id: number;
+                    username: string;
+                    color: string;
+                    email: string;
+                    profilePicture: null;
+                };
+                assignees: [];
+                watchers: [];
+                checklists: [];
+                tags: [];
+                parent: null;
+                priority: null;
+                due_date: null;
+                start_date: null;
+                points: null;
+                time_estimate: number;
+                custom_fields: [];
+                dependencies: [];
+                linked_tasks: [];
+                team_id: string;
+                url: string;
+                permission_level: string;
+                list: {
+                    id: string;
+                    name: string;
+                    access: boolean;
+                };
+                project: {
+                    id: string;
+                    name: string;
+                    hidden: boolean;
+                    access: boolean;
+                };
+                folder: {
+                    id: string;
+                    name: string;
+                    hidden: boolean;
+                    access: boolean;
+                };
+                space: {
+                    id: string;
+                };
             }>;
         };
     };

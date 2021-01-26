@@ -49,10 +49,8 @@ export const TimerEntries: React.FC<{ entries: TimeEntry[] }> = props => {
                             <EntryListItem key={id}>
                                 <EntryListText>{description || "No description"}</EntryListText>
                                 <EntryListProject onClick={() => openTask(task.id)}>
-                                    <Project color={stringToColor(project.name)}>
-                                        {project.name}
-                                    </Project>
-                                    <Task>{task.name}</Task>
+                                    <Project color={stringToColor(task.name)}>{task.name}</Project>
+                                    {false && <Task>{task.name}</Task>}
                                 </EntryListProject>
                                 <Billable>
                                     <svg width="17" height="17" viewBox="0 0 17 17">
