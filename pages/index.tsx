@@ -1,5 +1,6 @@
 import jsHttpCookie from "cookie";
 import { InferGetServerSidePropsType } from "next";
+import Head from "next/head";
 import React from "react";
 import styled from "styled-components";
 import { Navigation } from "../components/navigation/Navigation";
@@ -9,15 +10,18 @@ import { getCompositionRoot } from "../domain/CompositionRoot";
 
 export const TimerPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
     return (
-        <React.Fragment>
+        <div>
+            <Head>
+                <title>Clickup time tracking</title>
+            </Head>
             <Navigation />
             <PageWrapper>
                 <EnhancedPage>
-                    <TimerBar />
+                    <TimerBar spaces={props.spaces} />
                     <TimerEntries entries={props.entries} />
                 </EnhancedPage>
             </PageWrapper>
-        </React.Fragment>
+        </div>
     );
 };
 
@@ -45,7 +49,9 @@ export async function getServerSideProps({ req }) {
     const compositionRoot = getCompositionRoot();
     const entries = token ? await compositionRoot.timeTracking.list(token, 4528615) : [];
 
-    return { props: { entries } };
+    const spaces = token ? await compositionRoot.spaces.list(token, 4528615) : [];
+
+    return { props: { entries, spaces } };
 }
 
 export default TimerPage;

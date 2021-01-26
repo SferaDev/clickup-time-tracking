@@ -1,3 +1,4 @@
+import { ListSpacesUseCase } from "./usecases/ListSpacesUseCase";
 import { ListTimeEntriesUseCase } from "./usecases/ListTimeEntriesUseCase";
 
 export function getCompositionRoot() {
@@ -5,6 +6,8 @@ export function getCompositionRoot() {
         timeTracking: getExecute({
             list: new ListTimeEntriesUseCase(),
         }),
+
+        spaces: getExecute({ list: new ListSpacesUseCase() }),
     };
 }
 

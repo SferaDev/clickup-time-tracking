@@ -2,6 +2,7 @@ import { addMinutes, format, roundToNearestMinutes } from "date-fns";
 import _ from "lodash";
 import React from "react";
 import styled from "styled-components";
+import { stringToColor } from "../../data/utils/colors";
 import { TimeEntry } from "../../domain/entities/TimeEntry";
 
 export const TimerEntries: React.FC<{ entries: TimeEntry[] }> = props => {
@@ -92,15 +93,6 @@ function parseDuration(diff: number) {
 
 function formatTime(date: number) {
     return format(date, "HH:mm a");
-}
-
-function stringToColor(string: string): string {
-    let hash = 0;
-    for (var i = 0; i < string.length; i++) {
-        hash = string.charCodeAt(i) + ((hash << 5) - hash);
-    }
-
-    return `hsl(${hash % 100}, 60%, 50%)`;
 }
 
 const EntryList = styled.ul`

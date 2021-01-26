@@ -29,6 +29,18 @@ export class ClickupClient {
         };
     }
 
+    public get spaces() {
+        return {
+            list: this.buildEndpoint("get", "team/{{team}}/space"),
+        };
+    }
+
+    public get folders() {
+        return {
+            list: this.buildEndpoint("get", "space/{{space}}/folder"),
+        };
+    }
+
     public async request<T extends keyof ApiEndpoints>(
         method: ApiEndpoints[T]["method"],
         url: T,
@@ -171,6 +183,148 @@ interface ApiEndpoints {
                 id: string;
             };
             attachments: string[];
+        };
+    };
+    "team/{{team}}/space": {
+        method: "get";
+        params: { team: number; archived: boolean };
+        response: {
+            spaces: Array<{
+                id: string;
+                name: string;
+                private: boolean;
+                statuses: Array<{
+                    id: string;
+                    status: string;
+                    type: string;
+                    orderindex: number;
+                    color: string;
+                }>;
+                multiple_assignees: boolean;
+                features: {
+                    due_dates: {
+                        enabled: boolean;
+                        start_date: boolean;
+                        remap_due_dates: boolean;
+                        remap_closed_due_date: boolean;
+                    };
+                    sprints: {
+                        enabled: boolean;
+                    };
+                    time_tracking: {
+                        enabled: boolean;
+                        harvest: boolean;
+                        rollup: boolean;
+                    };
+                    points: {
+                        enabled: boolean;
+                    };
+                    priorities: {
+                        enabled: boolean;
+                        priorities: Array<{
+                            id: string;
+                            priority: string;
+                            color: string;
+                            orderindex: string;
+                        }>;
+                    };
+                    tags: {
+                        enabled: boolean;
+                    };
+                    time_estimates: {
+                        enabled: boolean;
+                        rollup: boolean;
+                        per_assignee: boolean;
+                    };
+                    check_unresolved: {
+                        enabled: boolean;
+                        subtasks: boolean;
+                        checklists: {};
+                        comments: {};
+                    };
+                    zoom: {
+                        enabled: boolean;
+                    };
+                    milestones: {
+                        enabled: boolean;
+                    };
+                    custom_fields: {
+                        enabled: boolean;
+                    };
+                    remap_dependencies: {
+                        enabled: boolean;
+                    };
+                    dependency_warning: {
+                        enabled: boolean;
+                    };
+                    multiple_assignees: {
+                        enabled: boolean;
+                    };
+                };
+                archived: boolean;
+                members: Array<{
+                    user: {
+                        id: number;
+                        username: string;
+                        color: string;
+                        profilePicture: {};
+                        initials: string;
+                    };
+                }>;
+            }>;
+        };
+    };
+    "space/{{space}}/folder": {
+        method: "get";
+        params: { space: number; archived: boolean };
+        response: {
+            folders: Array<{
+                id: string;
+                name: string;
+                orderindex: number;
+                override_statuses: boolean;
+                hidden: boolean;
+                space: {
+                    id: string;
+                    name: string;
+                };
+                task_count: string;
+                archived: boolean;
+                statuses: Array<{
+                    id: string;
+                    status: string;
+                    type: string;
+                    orderindex: number;
+                    color: string;
+                }>;
+                lists: Array<{
+                    id: string;
+                    name: string;
+                    orderindex: number;
+                    status: {};
+                    priority: {};
+                    assignee: {};
+                    task_count: string;
+                    due_date: {};
+                    start_date: {};
+                    space: {
+                        id: string;
+                        name: string;
+                        access: boolean;
+                    };
+                    archived: boolean;
+                    override_statuses: boolean;
+                    statuses: Array<{
+                        id: string;
+                        status: string;
+                        type: string;
+                        orderindex: number;
+                        color: string;
+                    }>;
+                    permission_level: string;
+                }>;
+                permission_level: string;
+            }>;
         };
     };
 }

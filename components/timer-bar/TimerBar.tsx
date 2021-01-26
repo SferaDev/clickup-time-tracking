@@ -1,12 +1,19 @@
-import React, { useState } from "react";
+import { flatMap } from "lodash";
+import React, { useMemo, useState } from "react";
 import styled from "styled-components";
+import { stringToColor } from "../../data/utils/colors";
+import { Space } from "../../domain/entities/Space";
+import { ListItem, ProjectPicker } from "../project-picker/ProjectPicker";
 
-export const TimerBar: React.FC = React.memo(() => {
+export const TimerBar: React.FC<{ spaces: Space[] }> = React.memo(({ spaces }) => {
     const [newTask, updateNewTask] = useState<{ description: string }>({ description: "" });
+    const [isOpenProjectDialog, openProjectDialog] = useState<boolean>(false);
 
     const saveTask = () => {
         window.alert("Not yet implemented");
     };
+
+    const items = useMemo(() => spacesToListItems(spaces), []);
 
     return (
         <NewTimeEntry>
@@ -25,7 +32,10 @@ export const TimerBar: React.FC = React.memo(() => {
                 </TimerContainer>
                 <TimerContainer2>
                     <TimerTrigger>
-                        <TimerIcon title="Select project">
+                        <TimerIcon
+                            title="Select project"
+                            onClick={() => openProjectDialog(value => !value)}
+                        >
                             <svg width="16" height="13" viewBox="0 0 16 13">
                                 <path
                                     fill="#95899b"
@@ -53,6 +63,7 @@ export const TimerBar: React.FC = React.memo(() => {
                         </TimerIcon>
                     </TimerTrigger>
                 </TimerContainer2>
+                <ProjectPicker open={isOpenProjectDialog} items={items} />
                 <div>
                     <Duration title="Add duration">
                         <span>0:00:00</span>
@@ -66,7 +77,7 @@ export const TimerBar: React.FC = React.memo(() => {
                         viewBox="0 0 40 40"
                         version="1"
                     >
-                        <g fill-rule="evenodd" fill="none">
+                        <g fillRule="evenodd" fill="none">
                             <g fill="#C463BA">
                                 <path d="M20 0C9 0 0 9 0 20 0 31 9 40 20 40 31 40 40 31 40 20 40 9 31 0 20 0ZM17 23.4L13.1 19.4C12.5 18.9 11.5 18.9 10.9 19.4 10.4 20 10.4 21 10.9 21.6L15.9 26.6C16.5 27.1 17.5 27.1 18.1 26.6L29.1 15.6C29.6 15 29.6 14 29.1 13.4 28.5 12.9 27.5 12.9 26.9 13.4L17 23.4Z"></path>
                             </g>
@@ -77,6 +88,25 @@ export const TimerBar: React.FC = React.memo(() => {
         </NewTimeEntry>
     );
 });
+
+function spacesToListItems(spaces: Space[]): ListItem[] {
+    const folders = flatMap(spaces, ({ name: folderName, folders }) =>
+        folders.map(({ name, ...rest }) => ({ ...rest, name: `${name} (${folderName})` }))
+    );
+
+    return [
+        { type: "item", id: "empty", title: "No project", color: "grey" },
+        ...flatMap(folders, ({ id, name: folderName, lists }) => [
+            { type: "heading" as const, id, title: folderName, color: stringToColor(folderName) },
+            ...lists.map(({ id, name }) => ({
+                type: "item" as const,
+                id,
+                title: name,
+                color: stringToColor(folderName),
+            })),
+        ]),
+    ];
+}
 
 const NewTimeEntry = styled.div`
     background-color: rgb(255, 255, 255);
@@ -90,6 +120,7 @@ const NewTimeEntry = styled.div`
     right: 0px;
     z-index: 301;
     min-width: 600px;
+    user-select: none;
 `;
 
 const TimerForm = styled.div`
